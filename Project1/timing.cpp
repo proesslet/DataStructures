@@ -10,7 +10,7 @@ using namespace std;
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 // Queries
-int linearSearch(int *array, int arraySize, int value)
+int linearSearch(int *array, int value, int low, int arraySize)
 {
     for (int i = 0; i < arraySize; i++)
     {
@@ -21,66 +21,69 @@ int linearSearch(int *array, int arraySize, int value)
     }
     return -1;
 }
-int binarySearch(int *array, int arraySize, int value)
+int binarySearch(int *array, int value, int low, int high)
 {
-    int low = 0;
-    int high = arraySize - 1;
-    int mid = (low + high) / 2;
-    while (low <= high)
+    if (low > high)
     {
-        if (array[mid] < value)
-        {
-            low = mid + 1;
-        }
-        else if (array[mid] == value)
+        return -1;
+    }
+    else
+    {
+        int mid = (low + high) / 2;
+        if (value == array[mid])
         {
             return mid;
         }
+        else if (value < array[mid])
+        {
+            return binarySearch(array, value, low, mid - 1);
+        }
         else
         {
-            high = mid - 1;
+            return binarySearch(array, value, mid + 1, high);
         }
-        mid = (low + high) / 2;
     }
-    return -1;
 }
-void find(int *values, int numValues, int *array, int arraySize, string arrayName, int (*search)(int *, int, int))
+void find(int *values, int numValues, int *array, int arraySize, string arrayName, int (*search)(int *, int, int, int))
 {
     clock_t start, end;
     double cpu_time_used;
+    int numTimes = 0;
     // create array to store times
     double times[numValues];
     start = clock();
     int index;
     for (int i = 0; i < numValues; i++)
     {
-        index = search(array, arraySize, values[i]);
+        index = search(array, values[i], 0, arraySize);
         if (index == -1)
         {
             cout << "Element " << values[i] << " not found in " << arrayName << endl;
             end = clock();
-            cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
+            cpu_time_used = end - start;
+            numTimes++;
             times[i] = cpu_time_used;
-            cout << "Time taken: " << cpu_time_used << " seconds" << endl;
+            cout << "Time taken: " << cpu_time_used << " clock ticks" << endl;
         }
         else
         {
             cout << "Element " << values[i] << " found at " << index << " in " << arrayName << endl;
             end = clock();
-            cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
+            cpu_time_used = end - start;
+            numTimes++;
             times[i] = cpu_time_used;
-            cout << "Time taken: " << cpu_time_used << " seconds" << endl;
+            cout << "Time taken: " << cpu_time_used << " clock ticks" << endl;
         }
     }
     // print empty line
     cout << endl;
     // find average time
     double sum = 0;
-    for (int i = 0; i < numValues; i++)
+    for (int i = 0; i < numTimes; i++)
     {
         sum += times[i];
     }
-    double average = sum / numValues;
+    double average = sum / numTimes;
     cout << "Average time: " << average << " seconds" << endl;
     cout << endl;
 }
@@ -89,6 +92,7 @@ void sumPairs(int target, int *array, int arraySize)
 {
     clock_t start, end;
     double cpu_time_used;
+    int numTimes = 0;
     // create array to store times
     double times[arraySize];
     start = clock();
@@ -102,8 +106,10 @@ void sumPairs(int target, int *array, int arraySize)
             {
                 cout << " = " << array[i] << " + " << array[j] << endl;
                 end = clock();
-                cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
-                cout << "Time taken: " << cpu_time_used << " seconds" << endl;
+                cpu_time_used = end - start;
+                numTimes++;
+                times[i] = cpu_time_used;
+                cout << "Time taken: " << cpu_time_used << " clock ticks" << endl;
                 return;
             }
         }
@@ -113,10 +119,11 @@ void sumPairs(int target, int *array, int arraySize)
 }
 
 // Operations
-int remove(int values[], int numValues, int *array, int arraySize, string arrayName, int (*search)(int *, int, int))
+int remove(int values[], int numValues, int *array, int arraySize, string arrayName, int (*search)(int *, int, int, int))
 {
     clock_t start, end;
     double cpu_time_used;
+    int numTimes = 0;
     // create array to store times
     double times[numValues];
     start = clock();
@@ -125,14 +132,15 @@ int remove(int values[], int numValues, int *array, int arraySize, string arrayN
     int numRemoved = 0;
     for (int i = 0; i < numValues; i++)
     {
-        index = search(array, arraySize, values[i]);
+        index = search(array, values[i], 0, arraySize);
         if (index == -1)
         {
             cout << "Element " << values[i] << " not found in " << arrayName << endl;
             end = clock();
-            cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
+            cpu_time_used = end - start;
+            numTimes++;
             times[i] = cpu_time_used;
-            cout << "Time taken: " << cpu_time_used << " seconds" << endl;
+            cout << "Time taken: " << cpu_time_used << " clock ticks" << endl;
         }
         else
         {
@@ -145,19 +153,21 @@ int remove(int values[], int numValues, int *array, int arraySize, string arrayN
             }
             arraySize -= 1;
             end = clock();
-            cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
-            cout << "Time taken: " << cpu_time_used << " seconds" << endl;
+            cpu_time_used = end - start;
+            numTimes++;
+            times[i] = cpu_time_used;
+            cout << "Time taken: " << cpu_time_used << " clock ticks" << endl;
         }
     }
 
     cout << endl;
     // find average time
     double sum = 0;
-    for (int i = 0; i < numValues; i++)
+    for (int i = 0; i < numTimes; i++)
     {
         sum += times[i];
     }
-    double average = sum / numValues;
+    double average = sum / numTimes;
     cout << "Average time: " << average << " seconds" << endl;
     cout << endl;
     return arraySize;
@@ -165,8 +175,9 @@ int remove(int values[], int numValues, int *array, int arraySize, string arrayN
 
 int insert(int values[], int numValues, int *array, int arraySize, string arrayName)
 {
-    clock_t start, end;
+    clock_t start, end = 0;
     double cpu_time_used;
+    int numTimes = 0;
     // create array to store times
     double times[numValues];
     start = clock();
@@ -183,8 +194,10 @@ int insert(int values[], int numValues, int *array, int arraySize, string arrayN
             array[index] = values[i];
             arraySize += 1;
             end = clock();
-            cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
-            cout << "Time taken: " << cpu_time_used << " seconds" << endl;
+            cpu_time_used = end - start;
+            numTimes++;
+            times[i] = cpu_time_used;
+            cout << "Time taken: " << cpu_time_used << " clock ticks" << endl;
         }
     }
     else
@@ -212,18 +225,22 @@ int insert(int values[], int numValues, int *array, int arraySize, string arrayN
             array[index] = values[i];
             arraySize += 1;
             end = clock();
-            cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
-            cout << "Time taken: " << cpu_time_used << " seconds" << endl;
+            cpu_time_used = end - start;
+            numTimes++;
+            times[i] = cpu_time_used;
+            cout << "Time taken: " << cpu_time_used << " clock ticks" << endl;
         }
     }
     cout << endl;
     // find average time
     double sum = 0;
-    for (int i = 0; i < numValues; i++)
+    for (int i = 0; i < numTimes; i++)
     {
+        cout << sum << " + " << times[i] << endl;
         sum += times[i];
     }
-    double average = sum / numValues;
+    cout << sum << " / " << numTimes << endl;
+    double average = sum / numTimes;
     cout << "Average time: " << average << " seconds" << endl;
     cout << endl;
     return arraySize;

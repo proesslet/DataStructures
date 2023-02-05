@@ -10,7 +10,9 @@ using namespace std;
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 // Queries
-int linearSearch(int *array, int arraySize, int value)
+// Linear Search Function
+// Returns the index of the value in the array
+int linearSearch(int *array, int value, int low, int arraySize)
 {
 	for (int i = 0; i < arraySize; i++)
 	{
@@ -21,35 +23,45 @@ int linearSearch(int *array, int arraySize, int value)
 	}
 	return -1;
 }
-int binarySearch(int *array, int arraySize, int value)
+
+// Binary Search Function
+// Returns the index of the value in the array using recursion
+// Learned this algorithm in my Java 2 class and modified it to work here
+// using slightly different parameters
+int binarySearch(int *array, int value, int low, int high)
 {
-	int low = 0;
-	int high = arraySize - 1;
-	int mid = (low + high) / 2;
-	while (low <= high)
+	if (low > high)
 	{
-		if (array[mid] < value)
-		{
-			low = mid + 1;
-		}
-		else if (array[mid] == value)
+		return -1;
+	}
+	else
+	{
+		int mid = (low + high) / 2;
+		if (value == array[mid])
 		{
 			return mid;
 		}
+		else if (value < array[mid])
+		{
+			return binarySearch(array, value, low, mid - 1);
+		}
 		else
 		{
-			high = mid - 1;
+			return binarySearch(array, value, mid + 1, high);
 		}
-		mid = (low + high) / 2;
 	}
-	return -1;
 }
-void find(int *values, int numValues, int *array, int arraySize, string arrayName, int (*search)(int *, int, int))
+
+// Find Query
+// Takes in an array of values and searches for each one in the corresponding array using
+// whichever search function is passed in as a parameter. It then uses cout to print where each
+// value was found or not found.
+void find(int *values, int numValues, int *array, int arraySize, string arrayName, int (*search)(int *, int, int, int))
 {
 	int index;
 	for (int i = 0; i < numValues; i++)
 	{
-		index = search(array, arraySize, values[i]);
+		index = search(array, values[i], 0, arraySize);
 		if (index == -1)
 		{
 			cout << "Element " << values[i] << " not found in " << arrayName << endl;
@@ -63,6 +75,8 @@ void find(int *values, int numValues, int *array, int arraySize, string arrayNam
 	cout << endl;
 }
 
+// Sum Pairs Query
+// Takes in a target value and searches for a pair of values in the array that add up to the target.
 void sumPairs(int target, int *array, int arraySize)
 {
 	cout << target << endl;
@@ -81,7 +95,11 @@ void sumPairs(int target, int *array, int arraySize)
 }
 
 // Operations
-int remove(int values[], int numValues, int *array, int arraySize, string arrayName, int (*search)(int *, int, int))
+// Remove Query
+// Takes in an array of values and first finds the index of that value in the corresponding array using
+// whichever search function is passed in as a parameter. It then removes the value from the array by
+// shifting all the values after it down one index. It returns the new size of the array.
+int remove(int values[], int numValues, int *array, int arraySize, string arrayName, int (*search)(int *, int, int, int))
 {
 
 	// find the index of the values in the array
@@ -89,7 +107,7 @@ int remove(int values[], int numValues, int *array, int arraySize, string arrayN
 	int numRemoved = 0;
 	for (int i = 0; i < numValues; i++)
 	{
-		index = search(array, arraySize, values[i]);
+		index = search(array, values[i], 0, arraySize);
 		if (index == -1)
 		{
 			cout << "Element " << values[i] << " not found in " << arrayName << endl;
@@ -97,6 +115,8 @@ int remove(int values[], int numValues, int *array, int arraySize, string arrayN
 		else
 		{
 			cout << "Removing " << values[i] << " at " << index << " in " << arrayName << endl;
+			// set the value to -1
+			array[index] = -1;
 			// remove the value from the array
 			for (int j = index; j < arraySize - 1; j++)
 			{
@@ -111,6 +131,10 @@ int remove(int values[], int numValues, int *array, int arraySize, string arrayN
 	return arraySize;
 }
 
+// Insert Query
+// Takes in an array of values and inserts them into the corresponding array. It returns the new size of the array.
+// If the array is A (unsorted), it inserts the values at the end of the array. If the array is B (sorted), it inserts
+// the values in the correct sorted position.
 int insert(int values[], int numValues, int *array, int arraySize, string arrayName)
 {
 	// find the index of the values in the array
@@ -164,10 +188,11 @@ int main()
 	int tempVal;	   // variable used to read the number
 	int numCommands;   // variable used to read the number of commands
 	char command;	   // variable used to store the command
-	int sizeOfA = 0;   // size of array A
-	int sizeOfB = 0;   // size of array B
+	int sizeOfA = 0;   // size of array A, initialized to 0
+	int sizeOfB = 0;   // size of array B, initialized to 0
 
 	cin >> maxValues; // read the maximum number of values from the redirected input file
+	currentValues = maxValues;
 
 	cout << "Length of the array: " << maxValues << endl;
 
@@ -190,15 +215,15 @@ int main()
 	}
 	cout << endl;
 
-	// sort the array A and store it in B - any sorting algorithm can be used
-	// Based by bubble sort algorithm on the online resource: https://www.geeksforgeeks.org/bubble-sort/
+	// create a dynamic array B of size maxValues and copy the values from array A to array B
+	// Based on the bubble sort algorithm on the online resource: https://www.geeksforgeeks.org/bubble-sort/
 	int *B = new int[maxValues];
 	for (int i = 0; i < maxValues; i++)
 	{
 		B[i] = A[i];
 		sizeOfB += 1;
 	}
-
+	// sort the array B
 	int i, j;
 	for (i = 0; i < maxValues - 1; i++)
 	{
@@ -221,11 +246,11 @@ int main()
 	}
 	cout << endl;
 
-	// TODO read the commands/options till the end of the file
+	// read the commands/options till the end of the file
 	while (true)
 	{
 
-		// check if a valid command was read in
+		// check if a valid command was read in, if not, end the loop
 		if (!(cin >> command))
 		{
 			break;
@@ -244,12 +269,12 @@ int main()
 		{
 		case 'F':
 			cout << "Find:" << endl;
+			// Call the find function on the arrays A and B
 			find(tempValues, numCommands, B, sizeOfB, "B", binarySearch);
 			find(tempValues, numCommands, A, sizeOfA, "A", linearSearch);
 
 			break;
 		case 'A':
-			// TODO
 			cout << "Sum Pairs:" << endl;
 			cout << "B:" << endl;
 			for (int i = 0; i < numCommands; i++)
@@ -267,6 +292,7 @@ int main()
 		case 'R':
 			// TODO
 			cout << "Remove:" << endl;
+			// Call the remove function on the arrays A and B
 			sizeOfB = remove(tempValues, numCommands, B, sizeOfB, "B", binarySearch);
 			sizeOfA = remove(tempValues, numCommands, A, sizeOfA, "A", linearSearch);
 
@@ -289,8 +315,8 @@ int main()
 			cout << endl;
 			break;
 		case 'I':
-			// TODO
 			cout << "Insert:" << endl;
+			// Call the insert function on the arrays A and B
 			sizeOfB = insert(tempValues, numCommands, B, sizeOfB, "B");
 			sizeOfA = insert(tempValues, numCommands, A, sizeOfA, "A");
 
