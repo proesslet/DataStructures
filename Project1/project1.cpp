@@ -9,7 +9,7 @@ using namespace std;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-// Queries
+// ~~~~~~~~~~~~~~Search Functions~~~~~~~~~~~~~~
 // Linear Search Function
 // Returns the index of the value in the array
 int linearSearch(int *array, int value, int low, int arraySize)
@@ -51,16 +51,19 @@ int binarySearch(int *array, int value, int low, int high)
 		}
 	}
 }
-
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Queries~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Find Query
 // Takes in an array of values and searches for each one in the corresponding array using
 // whichever search function is passed in as a parameter. It then uses cout to print where each
 // value was found or not found.
+// Learned how to pass in a function as a paramater from this website: https://www.geeksforgeeks.org/passing-a-function-as-a-parameter-in-cpp/
 void find(int *values, int numValues, int *array, int arraySize, string arrayName, int (*search)(int *, int, int, int))
 {
 	int index;
 	for (int i = 0; i < numValues; i++)
 	{
+		// Uses whichever searching algorithm was passed in as a parameter and assigns
+		// the index to the variable index
 		index = search(array, values[i], 0, arraySize);
 		if (index == -1)
 		{
@@ -94,8 +97,8 @@ void sumPairs(int target, int *array, int arraySize)
 	}
 }
 
-// Operations
-// Remove Query
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Operations~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Remove Operation
 // Takes in an array of values and first finds the index of that value in the corresponding array using
 // whichever search function is passed in as a parameter. It then removes the value from the array by
 // shifting all the values after it down one index. It returns the new size of the array.
@@ -131,7 +134,7 @@ int remove(int values[], int numValues, int *array, int arraySize, string arrayN
 	return arraySize;
 }
 
-// Insert Query
+// Insert Operation
 // Takes in an array of values and inserts them into the corresponding array. It returns the new size of the array.
 // If the array is A (unsorted), it inserts the values at the end of the array. If the array is B (sorted), it inserts
 // the values in the correct sorted position.
@@ -265,8 +268,10 @@ int main()
 			cin >> tempVal;
 			tempValues[i] = tempVal;
 		}
+		// switch statement to handle the different commands that could be read in
 		switch (command)
 		{
+		// Find Query
 		case 'F':
 			cout << "Find:" << endl;
 			// Call the find function on the arrays A and B
@@ -274,6 +279,7 @@ int main()
 			find(tempValues, numCommands, A, sizeOfA, "A", linearSearch);
 
 			break;
+		// SumPairs Query
 		case 'A':
 			cout << "Sum Pairs:" << endl;
 			cout << "B:" << endl;
@@ -289,6 +295,7 @@ int main()
 			}
 			cout << endl;
 			break;
+		// Remove Operation
 		case 'R':
 			// TODO
 			cout << "Remove:" << endl;
@@ -314,6 +321,7 @@ int main()
 			cout << endl;
 			cout << endl;
 			break;
+		// Insert Operation
 		case 'I':
 			cout << "Insert:" << endl;
 			// Call the insert function on the arrays A and B
@@ -337,13 +345,14 @@ int main()
 			cout << endl;
 
 			break;
+		// If any other command, tell the user that it is invalid
 		default:
 			cout << "Invalid command: " << command << endl;
 			break;
 		}
 	}
 
-	// TODO delete all the dynamically created arrays
+	// delete all the dynamically created arrays
 	delete[] A;
 	delete[] B;
 

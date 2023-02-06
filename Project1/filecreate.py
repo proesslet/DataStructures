@@ -52,15 +52,5 @@ for i in range(5):
 f.write("\n")
 
 
-
-
-
-
 # close the file
 f.close()
-
-
-
-
-
-
