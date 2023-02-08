@@ -60,7 +60,8 @@ void find(int *values, int numValues, int *array, int arraySize, string arrayNam
         {
             cout << "Element " << values[i] << " not found in " << arrayName << endl;
             end = clock();
-            cpu_time_used = end - start;
+            // convert ticks to seconds
+            cpu_time_used = double(end - start) / CLOCKS_PER_SEC;
             numTimes++;
             times[i] = cpu_time_used;
             cout << "Time taken: " << cpu_time_used << " clock ticks" << endl;
@@ -69,7 +70,7 @@ void find(int *values, int numValues, int *array, int arraySize, string arrayNam
         {
             cout << "Element " << values[i] << " found at " << index << " in " << arrayName << endl;
             end = clock();
-            cpu_time_used = end - start;
+            cpu_time_used = double(end - start) / CLOCKS_PER_SEC;
             numTimes++;
             times[i] = cpu_time_used;
             cout << "Time taken: " << cpu_time_used << " clock ticks" << endl;
@@ -275,7 +276,7 @@ int main()
     cout << "Array A: ";
     for (int i = 0; i < sizeOfA; i++)
     {
-        cout << A[i] << " ";
+        // cout << A[i] << " ";
     }
     cout << endl;
 
@@ -306,7 +307,7 @@ int main()
     cout << "Array B: ";
     for (int i = 0; i < sizeOfB; i++)
     {
-        cout << B[i] << " ";
+        // cout << B[i] << " ";
     }
     cout << endl;
 

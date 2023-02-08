@@ -1,10 +1,11 @@
 # create a file to match the input1.txt file
 import random
 
-x = 8000
+x = 1000000
 y = x*2
 nums = []
 for i in range(1, y):
+    print("adding " + str(i) + " to list" + "\n")
     nums.append(i)
 
 # open the file for writing
@@ -19,6 +20,7 @@ i=0
 while i < x:
     num = random.choice(nums)
     nums.remove(num)
+    print("writing " + str(x - 1) + "\n")
     f.write(str(num) + "\n")
     i += 1
 
