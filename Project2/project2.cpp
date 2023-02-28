@@ -18,6 +18,7 @@ protected:
 
 public:
 	// Constructors
+	// Default constructor
 	tableClass()
 	{
 		numRows = 0;
@@ -46,6 +47,10 @@ public:
 	}
 
 	// Method to trim trailing whitespacte from a string
+	// I had some major issues with this whole whitespace thing on my mac, but this seems to work. Spent a lot of time
+	// researching this issue and found this stack overflow post that helped me out a lot:
+	// https://stackoverflow.com/a/21815483. I hope it's okay that I used stack overflow for this specific issue. I was at my wits end
+	// with it.
 	inline string &stripWhiteSpace(string &s, const char *t = " \t\n\r\f\v")
 	{
 		s.erase(s.find_last_not_of(t) + 1);
@@ -258,18 +263,25 @@ public:
 	{
 		if (colNumber >= numCols)
 		{
-			string e = "Column Number " + to_string(colNumber) + " out of bounds";
-			throw e;
+			throw string("Column number is out of range");
 		}
-		double min = stod(myTable[1][colNumber]);
-		for (int i = 1; i < numRows; i++)
+		else if (!(DTarray[colNumber] == "int" || DTarray[colNumber] == "double" || DTarray[colNumber] == "float"))
 		{
-			if (stod(myTable[i][colNumber]) < min)
-			{
-				min = stod(myTable[i][colNumber]);
-			}
+			throw string("Column is not numeric");
 		}
-		return min;
+		else
+		{
+
+			double min = stod(myTable[1][colNumber]);
+			for (int i = 1; i < numRows; i++)
+			{
+				if (stod(myTable[i][colNumber]) < min)
+				{
+					min = stod(myTable[i][colNumber]);
+				}
+			}
+			return min;
+		}
 	}
 
 	// Destructor
@@ -295,11 +307,13 @@ int main()
 	int min;								  // min of the column
 	int colLeft, colRight, rowTop, rowBottom; // indices for the rows and columns
 
+	// read the number of rows, columns and file name
 	cin >> numRows >> numCols >> fileName;
 	cout << "NumRows: " << numRows << endl;
 	cout << "NumCols: " << numCols << endl;
 	cout << "FileName: " << fileName << endl;
 
+	// create a tableClass object
 	tableClass *d = new tableClass(numRows, numCols);
 
 	// read the file input name and call readCSV()
@@ -373,6 +387,7 @@ int main()
 			d->display();
 			break;
 		case 'I':
+			// Find
 			try
 			{
 				cin >> minCol;
