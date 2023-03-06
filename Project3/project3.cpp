@@ -18,7 +18,14 @@ class transaction
 
 public:
 	// default constructor
-	transaction();
+	transaction()
+	{
+		tID = 0;
+		fromID = 0;
+		toID = 0;
+		tAmount = 0;
+		timeStamp = "00:00:00";
+	}
 	// non default constructor
 	transaction(int temptID, int tempfromID, int temptoID, int temptAmount, string temptimeStamp)
 	{
@@ -88,8 +95,20 @@ class block
 	vector<transaction> bTransactions; // vector of transaction objects
 
 public:
-	block();								 // default constructor
-	block(int bNumber, int maxTransactions); // non default constructor
+	// default constructor
+	block()
+	{
+		blockNumber = 0;
+		maxNumTransactions = 0;
+		currentNumTransactions = 0;
+	}
+	// non default constructor
+	block(int bNumber, int maxTransactions)
+	{
+		blockNumber = bNumber;
+		maxNumTransactions = maxTransactions;
+		currentNumTransactions = 0;
+	}
 	// search method for searching through array of transactions
 	void search(int tID)
 	{
@@ -124,6 +143,10 @@ public:
 	{
 		return maxNumTransactions;
 	}
+	int getTransactionID(int index)
+	{
+		return bTransactions[index].getID();
+	}
 };
 
 class blockChain
@@ -132,7 +155,13 @@ class blockChain
 	list<block> bChain;	  // blockchain as a linked list
 
 public:
-	blockChain(); // default constructor
+	// default constructor
+	blockChain()
+	{
+		block b1;
+		bChain.push_front(b1);
+		currentNumBlocks = 1;
+	}
 	// non default constructor
 	blockChain(int tPerB)
 	{
@@ -166,6 +195,20 @@ public:
 	{
 		return currentNumBlocks;
 	}
+	int getTransactionsPerBlock()
+	{
+		return bChain.front().getMaxNumTransactions();
+	}
+	// get block method to get a block from the block chain
+	block getBlock(int bNumber)
+	{
+		list<block>::iterator it;
+		for (it = bChain.begin(); it != bChain.end(); it++)
+		{
+			if (it->getBlockNumber() == bNumber)
+				return *it;
+		}
+	}
 };
 
 int main()
@@ -184,6 +227,7 @@ int main()
 	blockChain *b1 = new blockChain(numTransactionsPerBlock);
 
 	// insert transactions into the blockchain
+	cout << "Inserting transactions into the blockchain..." << endl;
 	for (int i = 0; i < totalNumTransactions; i++)
 	{
 		int tID, fromID, toID, tAmount;
