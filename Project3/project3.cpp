@@ -226,8 +226,7 @@ int main()
 	// object of block chain
 	blockChain *b1 = new blockChain(numTransactionsPerBlock);
 
-	// insert transactions into the blockchain
-	cout << "Inserting transactions into the blockchain..." << endl;
+	// insert transactions into the blockchain for each transaction in input
 	for (int i = 0; i < totalNumTransactions; i++)
 	{
 		int tID, fromID, toID, tAmount;
