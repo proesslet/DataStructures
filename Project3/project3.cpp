@@ -1,6 +1,7 @@
 // Project 3
 // CS 2413 Data Structures
 // Spring 2023
+// Preston Roesslet
 
 #include <iostream>
 #include <vector> // for array of transactions
@@ -112,17 +113,20 @@ public:
 	// search method for searching through array of transactions
 	void search(int tID)
 	{
-		for (int i = 0; i < bTransactions.size(); i++)
+		for (int i = 0; i < currentNumTransactions; i++)
 		{
 			if (bTransactions[i].getID() == tID)
-				cout << "Transaction ID: " << bTransactions[i].getID() << " From ID: " << bTransactions[i].getFromID() << " To ID: " << bTransactions[i].getToID() << " Amount: " << bTransactions[i].getAmount() << " Time Stamp: " << bTransactions[i].getTimeStamp() << endl;
-			else
-				cout << "Transaction ID: " << tID << " not found" << endl;
+			{
+				cout << tID << " " << bTransactions[i].getFromID() << " " << bTransactions[i].getToID() << " " << bTransactions[i].getAmount() << " " << bTransactions[i].getTimeStamp() << endl;
+				return;
+			}
 		}
+		cout << "Transaction ID " << tID << " not found in block #" << blockNumber << endl;
 	}
 	// insert method to insert a new transaction
 	void insert(transaction t1)
 	{
+		cout << "Inserting transaction to block #" << blockNumber << endl;
 		bTransactions.push_back(t1);
 		currentNumTransactions++;
 	}
@@ -165,7 +169,9 @@ public:
 	// non default constructor
 	blockChain(int tPerB)
 	{
-		block b1(0, tPerB);
+		// Initialize the first block
+		cout << "Adding block #1" << endl;
+		block b1(1, tPerB);
 		bChain.push_front(b1);
 		currentNumBlocks = 1;
 	}
@@ -173,9 +179,11 @@ public:
 	// while inserting new block into list, insert front
 	void insert(transaction t1)
 	{
+		// If the existing bock is full, add a new one to the chain
 		if (bChain.front().getCurrentNumTransactions() == bChain.front().getMaxNumTransactions())
 		{
-			block b1(currentNumBlocks, bChain.front().getMaxNumTransactions());
+			cout << "Adding block #" << currentNumBlocks + 1 << endl;
+			block b1(currentNumBlocks + 1, bChain.front().getMaxNumTransactions());
 			b1.insert(t1);
 			bChain.push_front(b1);
 			currentNumBlocks++;
@@ -199,15 +207,18 @@ public:
 	{
 		return bChain.front().getMaxNumTransactions();
 	}
-	// get block method to get a block from the block chain
 	block getBlock(int bNumber)
 	{
+		block *b1 = new block();
 		list<block>::iterator it;
 		for (it = bChain.begin(); it != bChain.end(); it++)
 		{
 			if (it->getBlockNumber() == bNumber)
-				return *it;
+			{
+				*b1 = *it;
+			}
 		}
+		return *b1;
 	}
 };
 
@@ -226,7 +237,7 @@ int main()
 	// object of block chain
 	blockChain *b1 = new blockChain(numTransactionsPerBlock);
 
-	// insert transactions into the blockchain for each transaction in input
+	// insert each transation from input into the blockchain
 	for (int i = 0; i < totalNumTransactions; i++)
 	{
 		int tID, fromID, toID, tAmount;
@@ -237,6 +248,21 @@ int main()
 		transaction *t1 = new transaction(tID, fromID, toID, tAmount, timeStamp);
 
 		b1->insert(*t1);
+	}
+
+	// print the block chain
+	cout << "Current number of blocks: " << b1->getCurrentNumBlocks() << endl;
+	// print each block
+	for (int i = 1; i <= b1->getCurrentNumBlocks(); i++)
+	{
+		block b2 = b1->getBlock(i);
+		cout << "Block Number: " << b2.getBlockNumber() << " -- Number of Transaction: " << b2.getCurrentNumTransactions() << endl;
+		// print each transaction in the block
+		for (int j = 0; j < b2.getCurrentNumTransactions(); j++)
+		{
+			// Find and display transaction data
+			b2.search(b2.getTransactionID(j));
+		}
 	}
 
 	return 0;
