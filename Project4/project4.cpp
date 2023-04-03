@@ -414,7 +414,7 @@ void blockNetwork::display()
 {
     for (int i = 0; i < numNodes; i++)
     {
-        cout << "~~~ Node " << i << ":" << endl;
+        cout << "~~~ Node " << i << ": " << endl;
         allNodes[i].displayBlockChain();
     }
 }
