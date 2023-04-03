@@ -42,6 +42,7 @@ public:
     void displayTransaction();
 };
 
+// Non-Default Constructor
 transaction::transaction(int temptID, int tempfromID, int temptoID, int temptAmount, string temptimeStamp)
 {
     tID = temptID;
@@ -149,12 +150,14 @@ public:
     int getBlockNumber();
     int getCurrentNumTransactions();
     int getMaxNumTransactions();
+    vector<transaction> getBTransactions();
     // TODO: P4: search for an ID in the bTransaction vector
     int search(int id);
     // other methods as needed
     void displayBlock();
 };
 
+// Non-Default Constructor
 block::block(int bNumber, int maxTransactions)
 {
     blockNumber = bNumber;
@@ -162,6 +165,7 @@ block::block(int bNumber, int maxTransactions)
     currentNumTransactions = 0;
 }
 
+// Insert Method
 void block::insert(transaction t1)
 {
     bTransactions.push_back(t1);
@@ -189,23 +193,29 @@ int block::getMaxNumTransactions()
     return maxNumTransactions;
 }
 
+vector<transaction> block::getBTransactions()
+{
+    return bTransactions;
+}
+
 // Search for an ID in the bTransaction vector
 int block::search(int id)
 {
+    int index = -1;
     for (int i = 0; i < bTransactions.size(); i++)
     {
         if (bTransactions[i].getFromID() == id || bTransactions[i].getToID() == id)
         {
-            return i;
+            index = i;
         }
     }
-    return -1;
+    return index;
 }
 
 // Other Methods
 void block::displayBlock()
 {
-    cout << "Block Number: " << blockNumber << " -- Number of Transactions: " << currentNumTransactions << endl;
+    cout << "Block Number: " << blockNumber << " -- Number of Transaction: " << currentNumTransactions << endl;
     for (int i = 0; i < bTransactions.size(); i++)
     {
         bTransactions[i].displayTransaction();
@@ -228,28 +238,35 @@ public:
     // setters and getters as needed
     void setCurrentNumBlocks(int tempCurrentNumBlocks);
     int getCurrentNumBlocks();
+    list<block> getBChain();
     // TODO: P4: search for an ID across all blocks in bChain
     int search(int id);
     // other methods as needed
     void displayBlockChain();
 };
 
+// Non-Default Constructor
 blockChain::blockChain(int tPerB)
 {
-    block b1(0, tPerB);
+    block b1(1, tPerB);
     bChain.push_front(b1);
     currentNumBlocks = 1;
 }
 
+// Insert Method
 void blockChain::insert(transaction t1)
 {
     if (bChain.front().getCurrentNumTransactions() == bChain.front().getMaxNumTransactions())
     {
-        block b1(currentNumBlocks, bChain.front().getMaxNumTransactions());
+        block b1(currentNumBlocks + 1, bChain.front().getMaxNumTransactions());
+        b1.insert(t1);
         bChain.push_front(b1);
         currentNumBlocks++;
     }
-    bChain.front().insert(t1);
+    else
+    {
+        bChain.front().insert(t1);
+    }
 }
 
 // Setters and Getters
@@ -261,6 +278,10 @@ void blockChain::setCurrentNumBlocks(int tempCurrentNumBlocks)
 int blockChain::getCurrentNumBlocks()
 {
     return currentNumBlocks;
+}
+list<block> blockChain::getBChain()
+{
+    return bChain;
 }
 
 // Search for an ID across all blocks in bChain
@@ -281,7 +302,10 @@ int blockChain::search(int id)
 // Other Methods
 void blockChain::displayBlockChain()
 {
-    cout << "Current Number of Blocks: " << currentNumBlocks << endl;
+    cout << "Current number of blocks: " << currentNumBlocks << endl;
+    // Display all blocks in numerical order
+    // Reverse the list to display in numerical order
+    bChain.reverse();
     for (list<block>::iterator it = bChain.begin(); it != bChain.end(); it++)
     {
         it->displayBlock();
@@ -309,6 +333,7 @@ public:
     void display();
 };
 
+// Non-Default Constructor
 blockNetwork::blockNetwork(int numberOfNodes)
 {
     numNodes = numberOfNodes;
@@ -319,16 +344,61 @@ blockNetwork::blockNetwork(int numberOfNodes)
     }
 }
 
+// Insert Method
 void blockNetwork::insert(int nodeNumber, transaction t1)
 {
-    cout << "Inserting transaction to block #" << allNodes[nodeNumber].getCurrentNumBlocks() << " in node " << nodeNumber << endl;
+
     // Search for fromID and toID in the block chain
     int fromID = t1.getFromID();
     int toID = t1.getToID();
+    int fromIndex = allNodes[nodeNumber].search(fromID);
+    int toIndex = allNodes[nodeNumber].search(toID);
+    // If fromID is found, update the fromValue in new transaction
+    if (fromIndex != -1)
+    {
+        // Get the most recent transaction containing the fromID
+        transaction lastTransaction = allNodes[nodeNumber].getBChain().front().getBTransactions()[fromIndex];
+        // If the fromID was the fromID in the last transaction,
+        // subtract the amount from the fromValue in the new transaction
+        if (fromID == lastTransaction.getFromID())
+        {
+            t1.setFromValue(lastTransaction.getFromValue() - lastTransaction.getTAmount());
+        }
+        // If the fromID was the toID in the last transaction,
+        // add the amount to the fromValue in the new transaction
+        else if (fromID == lastTransaction.getToID())
+        {
+            t1.setFromValue(lastTransaction.getToValue() + lastTransaction.getTAmount());
+        }
+    }
+    // If toID is found, update the toValue in new transaction
+    if (toIndex != -1)
+    {
+        // Get the most recent transaction containing the toID
+        transaction lastTransaction = allNodes[nodeNumber].getBChain().front().getBTransactions()[toIndex];
+        // If the toID was the fromID in the last transaction,
+        // subtract the amount from the toValue in the new transaction
+        if (toID == lastTransaction.getFromID())
+        {
+            t1.setToValue(lastTransaction.getFromValue() - lastTransaction.getTAmount());
+        }
+        // If the toID was the toID in the last transaction,
+        // add the amount to the toValue in the new transaction
+        else if (toID == lastTransaction.getToID())
+        {
+            t1.setToValue(lastTransaction.getToValue() + lastTransaction.getTAmount());
+        }
+    }
+    // If neither ID is found, keep default values (no need to do anything here
+    // as the default values are 0 already).
 
+    // Insert new transaction into block chain
     allNodes[nodeNumber].insert(t1);
+    cout << "Inserting transaction to block #" << allNodes[nodeNumber].getCurrentNumBlocks() << " in node " << nodeNumber << endl;
 }
+
 // Setters and Getters
+// Add u and v to their respective vectors
 void blockNetwork::setU(int tempU)
 {
     u.push_back(tempU);
@@ -344,7 +414,7 @@ void blockNetwork::display()
 {
     for (int i = 0; i < numNodes; i++)
     {
-        cout << "~~~ Node " << i << endl;
+        cout << "~~~ Node " << i << ":" << endl;
         allNodes[i].displayBlockChain();
     }
 }
@@ -371,7 +441,7 @@ int main()
     // object of block network
     blockNetwork *n1 = new blockNetwork(numNodesInNetwork);
 
-    // TODO: input the transaction information and insert to n1
+    // Input the transaction information and insert to n1
     int numEdges;
     cin >> numEdges;
     for (int i = 0; i < numEdges; i++)
@@ -383,9 +453,9 @@ int main()
     }
     for (int i = 0; i < totalNumTransactions; i++)
     {
-        int nodeNumber, tID, fromID, toID, amount, tAmount;
+        int nodeNumber, tID, fromID, toID, tAmount;
         string timeStamp;
-        cin >> nodeNumber >> tID >> fromID >> toID >> amount >> tAmount >> timeStamp;
+        cin >> nodeNumber >> tID >> fromID >> toID >> tAmount >> timeStamp;
         transaction t1(tID, fromID, toID, tAmount, timeStamp);
         n1->insert(nodeNumber, t1);
     }
