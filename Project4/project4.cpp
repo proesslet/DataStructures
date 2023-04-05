@@ -151,7 +151,7 @@ public:
     int getCurrentNumTransactions();
     int getMaxNumTransactions();
     vector<transaction> getBTransactions();
-    // TODO: P4: search for an ID in the bTransaction vector
+    // P4: search for an ID in the bTransaction vector
     int search(int id);
     // other methods as needed
     void displayBlock();
@@ -239,6 +239,7 @@ public:
     void setCurrentNumBlocks(int tempCurrentNumBlocks);
     int getCurrentNumBlocks();
     list<block> getBChain();
+    block getBlock(int index);
     // TODO: P4: search for an ID across all blocks in bChain
     int search(int id);
     // other methods as needed
@@ -284,19 +285,32 @@ list<block> blockChain::getBChain()
     return bChain;
 }
 
+block blockChain::getBlock(int index)
+{
+    list<block>::iterator it = bChain.begin();
+    advance(it, index);
+    return *it;
+}
+
 // Search for an ID across all blocks in bChain
 int blockChain::search(int id)
 {
     int index = -1;
+    int i = 0;
     for (list<block>::iterator it = bChain.begin(); it != bChain.end(); it++)
     {
         index = it->search(id);
         if (index != -1)
         {
-            return index;
+            break;
         }
+        i++;
     }
-    return -1;
+    if (index == -1)
+    {
+        i = -1;
+    }
+    return i;
 }
 
 // Other Methods
@@ -351,13 +365,23 @@ void blockNetwork::insert(int nodeNumber, transaction t1)
     // Search for fromID and toID in the block chain
     int fromID = t1.getFromID();
     int toID = t1.getToID();
-    int fromIndex = allNodes[nodeNumber].search(fromID);
-    int toIndex = allNodes[nodeNumber].search(toID);
+    int fromBlock = allNodes[nodeNumber].search(fromID);
+    int fromIndex = -1;
+    if (fromBlock != -1)
+    {
+        fromIndex = allNodes[nodeNumber].getBlock(fromBlock).search(fromID);
+    }
+    int toBlock = allNodes[nodeNumber].search(toID);
+    int toIndex = -1;
+    if (toBlock != -1)
+    {
+        toIndex = allNodes[nodeNumber].getBlock(toBlock).search(toID);
+    }
     // If fromID is found, update the fromValue in new transaction
     if (fromIndex != -1)
     {
         // Get the most recent transaction containing the fromID
-        transaction lastTransaction = allNodes[nodeNumber].getBChain().front().getBTransactions()[fromIndex];
+        transaction lastTransaction = allNodes[nodeNumber].getBlock(fromBlock).getBTransactions()[fromIndex];
         // If the fromID was the fromID in the last transaction,
         // subtract the amount from the fromValue in the new transaction
         if (fromID == lastTransaction.getFromID())
@@ -375,7 +399,7 @@ void blockNetwork::insert(int nodeNumber, transaction t1)
     if (toIndex != -1)
     {
         // Get the most recent transaction containing the toID
-        transaction lastTransaction = allNodes[nodeNumber].getBChain().front().getBTransactions()[toIndex];
+        transaction lastTransaction = allNodes[nodeNumber].getBlock(toBlock).getBTransactions()[toIndex];
         // If the toID was the fromID in the last transaction,
         // subtract the amount from the toValue in the new transaction
         if (toID == lastTransaction.getFromID())
