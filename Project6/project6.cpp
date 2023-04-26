@@ -3,14 +3,19 @@
 // Spring 2023
 
 #include <iostream>
-#include <string> // for storing string
+#include <string>  // for storing string
 #include <fstream> // for reading a file again and again
-#include <map> 
-#include <unordered_map> 
+#include <map>
+#include <unordered_map>
 
 using namespace std;
 
-// write hash function
+// Hash Function
+void hashFunction(string s)
+{
+	// TODO: Write hash function
+}
+
 // write display functions for map and unordered map
 
 using namespace std;
@@ -24,41 +29,38 @@ int main()
 	cin >> fileName;
 	cout << "Name of fileInput: " << fileName << endl;
 
-
 	// MAP
-	map <int, vector<string> > m1;
+	map<int, vector<string>> m1;
 	// open a fileName in read mode
-	ifstream fI; 
+	ifstream fI;
 	fI.open(fileName);
 
 	char option;
 	string temp;
-    // reading and performing operations
-    // start timer
-	while(fI >> option)
+	// reading and performing operations
+	// start timer
+	while (fI >> option)
 	{
 		fI >> temp;
 		// create the structure - map - m1
 	}
-    // stop timer
+	// stop timer
 
 	// close the opened file
 	fI.close();
 
-
-
 	// UNORDERED MAP
-	unordered_map<int, vector<string> > m2;
+	unordered_map<int, vector<string>> m2;
 	// open a file again in read mode
 	fI.open(fileName);
 
-    // start timer
-	while(fI >> option)
+	// start timer
+	while (fI >> option)
 	{
 		fI >> temp;
 		// create the structure - unordered map - m2
 	}
-    // stop timer
+	// stop timer
 
 	// close the opened file
 	fI.close();
