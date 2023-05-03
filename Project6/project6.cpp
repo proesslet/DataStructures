@@ -14,7 +14,8 @@ using namespace std;
 // Hash Function
 int hashFunction(string s)
 {
-	// Write hash function for string using chaining (?) to handle collisions
+	// Write hash function for string using chaining to handle collisions
+	// Idea for this was provided by the TA in an announcement
 	// Mod 26
 	int hash_value = 0;
 	int ascii_value = (int)s[0];
@@ -40,7 +41,7 @@ void displayMap(map<int, vector<string>> m)
 
 void displayUnorderedMap(unordered_map<int, vector<string>> m)
 {
-	cout << "Unordered map" << endl;
+	cout << "Unordered Map:" << endl;
 	for (auto it = m.begin(); it != m.end(); it++)
 	{
 		cout << it->first << ": ";
@@ -73,7 +74,7 @@ int main()
 	string temp;
 	// reading and performing operations
 	// start timer
-	clock_t start = clock();
+	// clock_t start = clock();
 	while (fI >> option)
 	{
 		fI >> temp;
@@ -106,9 +107,9 @@ int main()
 		}
 	}
 	// stop timer
-	clock_t stop = clock();
-	double elapsed = (double)(stop - start) * 1000.0 / CLOCKS_PER_SEC;
-	cout << "Elapsed time for map in ms: " << elapsed << endl;
+	// clock_t stop = clock();
+	// double elapsed = (double)(stop - start) * 1000.0 / CLOCKS_PER_SEC;
+	// cout << "Elapsed time for map in ms: " << elapsed << endl;
 
 	// close the opened file
 	fI.close();
@@ -119,7 +120,7 @@ int main()
 	fI.open(fileName);
 
 	// start timer
-	start = clock();
+	// start = clock();
 	while (fI >> option)
 	{
 		fI >> temp;
@@ -151,9 +152,9 @@ int main()
 		}
 	}
 	// stop timer
-	stop = clock();
-	elapsed = (double)(stop - start) * 1000.0 / CLOCKS_PER_SEC;
-	cout << "Elapsed time for unordered map in ms: " << elapsed << endl;
+	// stop = clock();
+	// elapsed = (double)(stop - start) * 1000.0 / CLOCKS_PER_SEC;
+	// cout << "Elapsed time for unordered map in ms: " << elapsed << endl;
 
 	// close the opened file
 	fI.close();
